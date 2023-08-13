@@ -1,4 +1,14 @@
+import 'dart:html';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'dart:async';
+//import 'package:audio_session/audio_session.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+final recorder = FlutterSoundRecorder();
 
 
 void main() {
@@ -32,7 +42,7 @@ class _BottomNavigationMenuState extends State<BottomNavigationMenu> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Memo 2 Voice'),
+        title: Text('Voice 333 Memo'),
       ),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -75,14 +85,33 @@ class MemoScreen extends StatefulWidget {
   _MemoScreenState createState() => _MemoScreenState();
 }
 
+Future record() async {
+  await recorder.startRecorder(toFile: 'audio');
+}
+
+Future stop() async {
+  await recorder.stopRecorder();
+}
 
 class _MemoScreenState extends State<MemoScreen> {
   bool _isPaused = true;
 
   void _togglePause() async {
+    var status = await Permission.microphone.request();
     setState(() {
       _isPaused = !_isPaused;
     });
+
+    if (status.isGranted) {
+      if (recorder.isRecording) {
+        await stop();
+      } else {
+        await record();
+      }
+    } else if (status.isDenied) {
+      // Permission denied, show a message to the user
+      print('Microphone permission denied');
+    }
   }
 
   void _pressStop() {
@@ -114,7 +143,7 @@ class _MemoScreenState extends State<MemoScreen> {
           ),
           SizedBox(width: 16), // Adding some spacing between the FABs
           FloatingActionButton(
-            onPressed: _togglePause,
+            onPressed: _togglePause ,
             child: _isPaused ? Icon(Icons.circle_rounded) : Icon(Icons.pause),
           ),
         ],
