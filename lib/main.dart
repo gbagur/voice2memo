@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:record/record.dart';
 
+
+String msg2 = "Press the record button below to start!!!";
 
 void main() {
+
   runApp(MyApp());
 }
 
@@ -76,17 +82,53 @@ class MemoScreen extends StatefulWidget {
 }
 
 
+
 class _MemoScreenState extends State<MemoScreen> {
   bool _isPaused = true;
+  String msg3 = "3. ";
+
+
+
+  void foo() async {
+    final player = AudioPlayer(); // Create a player
+    final duration = await player.setUrl( // Load a URL
+        'https://www.myinstants.com/media/sounds/suiiiiiiiiiii.mp3'); // Schemes: (https: | file: | asset: )
+    player.play(); // Play without waiting for completion
+  }
+
+  void foofile() async {
+    final player = AudioPlayer(); // Create a player
+    String filePath = 'sounds/test.mp3'; // Adjust the path to match your asset location
+
+    try {
+      final duration = await player.setAsset(filePath); // Use setAsset to play audio from assets
+      player.play();
+    } catch (e) {
+      print('Error playing audio: $e');
+    }
+  }
+
+  void foorec() async {
+    final player = AudioPlayer(); // Create a player
+    String filePath = 'sounds/test.mp3';
+    final duration = await player.setFilePath(filePath);
+    player.play(); // Play without waiting for completion
+  }
 
   void _togglePause() async {
     setState(() {
       _isPaused = !_isPaused;
+
+    foo();
     });
   }
 
   void _pressStop() {
-
+    msg2 = "BBB";
+    setState(() {
+      msg3 = "3. CCC";
+      foofile();
+    });
   }
 
   @override
@@ -99,7 +141,9 @@ class _MemoScreenState extends State<MemoScreen> {
           children: [
             Text('You have no recordings'),
             Text(''),
-            Text('Press the record button below to start!'),
+            Text(msg2),
+            Text(''),
+            Text(msg3),
           ],
         ),
       ),
